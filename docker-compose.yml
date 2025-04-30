@@ -1,0 +1,13 @@
+version: '3.8'
+
+services:
+  user_ms:
+    build: .
+    container_name: user_ms
+    restart: always
+    volumes:
+      - .:/app
+    environment:
+      - PYTHONUNBUFFERED=1
+    env_file:
+      - .env
