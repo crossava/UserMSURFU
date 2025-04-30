@@ -1,11 +1,9 @@
-import json
-
 from app.utils.kafka_helper import get_consumer
 from app.cli.producer import *
 from app.core.kafka_config import TOPICS
 from pydantic import ValidationError
 
-from app.utils.user_service import register_user, confirm_email, login_user
+from app.services.user_service import register_user, confirm_email, login_user
 
 TOPIC_LIST = [TOPICS["requests"]]
 
