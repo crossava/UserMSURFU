@@ -1,0 +1,14 @@
+venv/
+__pycache__/
+*.log
+*.pyc
+*.env
+*.env.dev
+*.pyc
+versions/
+
+
+env.py
+settings.json
+
+**/media-orzp/
