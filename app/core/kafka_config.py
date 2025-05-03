@@ -1,4 +1,13 @@
-BROKERS = "77.232.135.48:9092,77.232.135.48:9094"
+import os
+
+from dotenv import load_dotenv
+
+load_dotenv()
+
+KAFKA_BROKERS = os.getenv("KAFKA_BROKERS")
+REQUESTS_TOPIC = os.getenv("KAFKA_TOPIC_REQUESTS")
+RESPONSES_TOPIC = os.getenv("KAFKA_TOPIC_RESPONSES")
+BROKERS = KAFKA_BROKERS
 
 KAFKA_CONFIG = {
     "bootstrap.servers": BROKERS,
@@ -17,6 +26,6 @@ PRODUCER_CONFIG = {
 }
 
 TOPICS = {
-    "requests": "user_requests",
-    "responses": "user_responses"
+    "requests": REQUESTS_TOPIC,
+    "responses": RESPONSES_TOPIC
 }

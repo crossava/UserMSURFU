@@ -42,65 +42,6 @@ def send_email_confirmation(recipient_email: str, confirmation_code: str):
         print(f"❌ Ошибка отправки письма: {e}")
 
 
-def confirm_email(data: dict, action: str) -> dict:
-    email = data.get("email")
-    code = data.get("confirmation_code")
-
-    if not email or not code:
-        return {
-            "message": {
-                "action": action,
-                "status": "error",
-                "text": "Email и код обязательны"
-            }
-        }
-
-    user = db.users.find_one({"email": email})
-
-    if not user:
-        return {
-            "message": {
-                "action": action,
-                "status": "error",
-                "text": "Пользователь не найден"
-            }
-        }
-
-    if user.get("is_email_confirmed"):
-        return {
-            "message": {
-                "action": action,
-                "status": "error",
-                "text": "Почта уже подтверждена"
-            }
-        }
-
-    if user.get("confirmation_code") != code:
-        return {
-            "message": {
-                "action": action,
-                "status": "error",
-                "text": "Неверный код подтверждения"
-            }
-        }
-
-    db.users.update_one(
-        {"email": email},
-        {
-            "$set": {"is_email_confirmed": True},
-            "$unset": {"confirmation_code": ""}
-        }
-    )
-
-    return {
-        "message": {
-            "action": action,
-            "status": "success",
-            "text": "Почта подтверждена"
-        }
-    }
-
-
 def create_token(data: dict, expires_delta: timedelta) -> str:
     to_encode = data.copy()
     expire = datetime.utcnow() + expires_delta

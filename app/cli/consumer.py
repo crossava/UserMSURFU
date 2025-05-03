@@ -3,7 +3,7 @@ from app.cli.producer import *
 from app.core.kafka_config import TOPICS
 from pydantic import ValidationError
 
-from app.services.user_service import register_user, confirm_email, login_user
+from app.services.user_service import register_user, confirm_email, login_user, refresh_token_handler
 
 TOPIC_LIST = [TOPICS["requests"]]
 
@@ -27,6 +27,9 @@ def process_new_message(action, request_id, message):
             send_response(request_id, result["message"])
         elif action == "login":
             result = login_user(message["data"], action)
+            send_response(request_id, result["message"])
+        elif action == "refresh_token":
+            result = refresh_token_handler(message, action)
             send_response(request_id, result["message"])
 
     except ValidationError as ve:

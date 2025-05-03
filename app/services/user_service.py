@@ -1,10 +1,13 @@
-
 from datetime import datetime, timedelta
 from random import randint
 
+import jwt
 from passlib.hash import bcrypt
 from app.core.mongo_config import db
 from dotenv import load_dotenv
+
+from app.utils.user_helper import create_token, ACCESS_TOKEN_EXPIRE_MINUTES, REFRESH_TOKEN_EXPIRE_DAYS, \
+    send_email_confirmation, JWT_SECRET, JWT_ALGORITHM
 
 
 def register_user(data: dict, action: str) -> dict:
@@ -62,6 +65,66 @@ def register_user(data: dict, action: str) -> dict:
         }
     }
 
+
+def refresh_token_handler(message: dict, action: str) -> dict:
+    refresh_token = message.get("refresh_token")
+    if not refresh_token:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Refresh token отсутствует"
+            }
+        }
+
+    try:
+        payload = jwt.decode(refresh_token, JWT_SECRET, algorithms=[JWT_ALGORITHM])
+    except jwt.ExpiredSignatureError:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Токен истёк"
+            }
+        }
+    except jwt.InvalidTokenError:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Невалидный токен"
+            }
+        }
+
+    user = db.users.find_one({"email": payload["sub"]})
+    if not user:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Пользователь не найден"
+            }
+        }
+
+    new_payload = {
+        "sub": user["email"],
+        "role": user["role"],
+        "full_name": user["full_name"],
+    }
+
+    access_token = create_token(new_payload, timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES))
+    refresh_token = create_token(new_payload, timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS))
+
+    return {
+        "message": {
+            "action": action,
+            "status": "success",
+            "body": {
+                "access_token": access_token,
+                "refresh_token": refresh_token
+            }
+        }
+    }
 
 
 def login_user(data: dict, action: str) -> dict:
@@ -131,3 +194,60 @@ def login_user(data: dict, action: str) -> dict:
     }
 
 
+def confirm_email(data: dict, action: str) -> dict:
+    email = data.get("email")
+    code = data.get("confirmation_code")
+
+    if not email or not code:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Email и код обязательны"
+            }
+        }
+
+    user = db.users.find_one({"email": email})
+
+    if not user:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Пользователь не найден"
+            }
+        }
+
+    if user.get("is_email_confirmed"):
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Почта уже подтверждена"
+            }
+        }
+
+    if user.get("confirmation_code") != code:
+        return {
+            "message": {
+                "action": action,
+                "status": "error",
+                "text": "Неверный код подтверждения"
+            }
+        }
+
+    db.users.update_one(
+        {"email": email},
+        {
+            "$set": {"is_email_confirmed": True},
+            "$unset": {"confirmation_code": ""}
+        }
+    )
+
+    return {
+        "message": {
+            "action": action,
+            "status": "success",
+            "text": "Почта подтверждена"
+        }
+    }
