@@ -15,7 +15,6 @@ from app.utils.user_helper import (
 def validate_email(email: str) -> bool:
     return "@" in email and "." in email.split("@")[-1]
 
-# Валидация телефона (пример для российских номеров)
 def validate_phone(phone: str) -> bool:
     return bool(re.match(r"^\+7\d{10}$", phone))
 
@@ -48,7 +47,7 @@ def get_all_users(action: str):
         }
 
 def register_user(data: dict, action: str) -> dict:
-    required_fields = {"email", "full_name", "role", "password"}
+    required_fields = {"email", "full_name", "role", "password", "phone"}
     if not required_fields.issubset(data):
         return {
             "message": {

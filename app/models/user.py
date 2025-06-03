@@ -8,7 +8,7 @@ class UserModel(BaseModel):
     hashed_password: str
     full_name: str
     role: str
-    phone: Optional[str] = None  # Новое поле
+    phone: str
     is_blocked: bool = False
     blocked_until: Optional[datetime] = None
     is_email_confirmed: bool = False
