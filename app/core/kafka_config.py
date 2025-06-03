@@ -1,3 +1,5 @@
+# app/core/kafka_config.py
+
 import os
 
 from dotenv import load_dotenv

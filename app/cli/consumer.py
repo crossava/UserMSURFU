@@ -1,3 +1,5 @@
+# app/cli/consumer.py
+
 from app.utils.kafka_helper import get_consumer
 from app.cli.producer import *
 from app.core.kafka_config import TOPICS

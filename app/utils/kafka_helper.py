@@ -1,3 +1,5 @@
+# app/utils/kafka_helper.py
+
 from confluent_kafka import Producer, Consumer
 from app.core.kafka_config import PRODUCER_CONFIG, CONSUMER_CONFIG, TOPICS
 
