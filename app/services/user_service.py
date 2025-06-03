@@ -10,6 +10,39 @@ from app.utils.user_helper import create_token, ACCESS_TOKEN_EXPIRE_MINUTES, REF
     send_email_confirmation, JWT_SECRET, JWT_ALGORITHM
 
 
+def get_all_users(action: str):
+    try:
+        users_cursor = db.users.find()
+        users = []
+
+        for user in users_cursor:
+            user["_id"] = str(user["_id"])
+            user.pop("password", None)
+
+            # Обработка всех datetime полей
+            for field in ["created_at", "updated_at", "last_login"]:  # или любые другие поля
+                if field in user and isinstance(user[field], datetime):
+                    user[field] = user[field].isoformat()
+
+            users.append(user)
+
+        return {
+            "action": action,
+            "message": {
+                "status": "success",
+                "users": users
+            }
+        }
+
+    except Exception as e:
+        return {
+            "action": action,
+            "message": {
+                "status": "error",
+                "details": str(e)
+            }
+        }
+
 def register_user(data: dict, action: str) -> dict:
     required_fields = {"email", "full_name", "role", "password"}
     if not required_fields.issubset(data):
