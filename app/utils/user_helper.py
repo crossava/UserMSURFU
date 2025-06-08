@@ -25,7 +25,7 @@ def send_email_confirmation(recipient_email: str, confirmation_code: str):
     msg["To"] = recipient_email
     msg.set_content(f"Ваш код подтверждения: {confirmation_code}")
     try:
-        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=10) as server:
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT, timeout=30) as server:
             server.starttls()
             server.login(SMTP_USER, SMTP_PASSWORD)
             server.send_message(msg)

@@ -30,12 +30,13 @@ def process_new_message(action, request_id, message):
         elif action == "login":
             result = login_user(message["data"], action)
             send_response(request_id, result["message"])
-        elif action == "refresh_token":
-            result = refresh_token_handler(message, action)
-            send_response(request_id, result["message"])
         elif action == "get_all_users":
             result = get_all_users(action)
+            send_response(request_id, result)
+        elif action == "update_user":
+            result = update_user(message["data"], action)
             send_response(request_id, result["message"])
+
 
     except ValidationError as ve:
         print(f"⚠️ Ошибка валидации данных: {ve}")
