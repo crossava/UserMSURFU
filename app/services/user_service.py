@@ -50,6 +50,32 @@ def get_all_users(action: str):
         }
 
 
+def get_volunteer_count(action: str):
+    try:
+        volunteer_count = db.users.count_documents({
+            "role": {"$in": ["volunteer", "both"]}
+        })
+
+        return {
+            "message": {
+                "action": action,
+                "status": "success",
+                "data": {
+                    "volunteer_count": volunteer_count
+                }
+            }
+        }
+    except Exception as e:
+        return {
+            "action": action,
+            "status": "error",
+            "message": {
+                "details": str(e)
+            }
+        }
+
+
+
 def register_user(data: dict, action: str) -> dict:
     required_fields = {"email", "full_name", "role", "password", "phone", "address"}
     print(data)
@@ -197,6 +223,8 @@ def login_user(data: dict, action: str) -> dict:
                 "email": user["email"],
                 "phone": user.get("phone"),
                 "address": user.get("address"),
+                "telegram_id": user.get("telegram_id"),
+                "vk_id": user.get("vk_id"),
                 "created_at": user.get("created_at").isoformat() if user.get("created_at") else None,
                 "access_token": access_token,
                 "refresh_token": refresh_token,
@@ -276,7 +304,7 @@ def update_user(data: dict, action: str) -> dict:
         }
 
     update_fields = {}
-    for field in ["full_name", "phone", "address", "role", "is_blocked", "blocked_until"]:
+    for field in ["full_name", "phone", "address", "role", "is_blocked", "blocked_until", "telegram_id", "vk_id"]:
         if field in data:
             update_fields[field] = data[field]
 

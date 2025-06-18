@@ -1,6 +1,7 @@
 # app/core/kafka_config.py
 
 import os
+import uuid
 
 from dotenv import load_dotenv
 
@@ -17,8 +18,8 @@ KAFKA_CONFIG = {
 
 CONSUMER_CONFIG = {
     **KAFKA_CONFIG,
-    "group.id": "user_ms",
-    "auto.offset.reset": "earliest",
+    "group.id": "user_ms" + str(uuid.uuid4()),
+    "auto.offset.reset": "latest",
     "enable.auto.commit": True,
     "session.timeout.ms": 10000,
 }

@@ -36,6 +36,9 @@ def process_new_message(action, request_id, message):
         elif action == "update_user":
             result = update_user(message["data"], action)
             send_response(request_id, result["message"])
+        elif action == "volunteer_count":
+            result = get_volunteer_count(action)
+            send_response(request_id, result["message"])
 
 
     except ValidationError as ve:

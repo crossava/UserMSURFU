@@ -16,3 +16,5 @@ class UserModel(BaseModel):
     confirmation_code: Optional[str] = None
     created_at: datetime
     address: Optional[str] = None
+    telegram_id: Optional[str] = None
+    vk_id: Optional[str] = None
